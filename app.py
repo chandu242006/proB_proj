@@ -1,12 +1,4 @@
-"""
-=============================================================
-  Tennis Player Endurance & Winning Probability Model
-  Flask Web Application
-=============================================================
-  Converts the original CLI Python program into a web app.
-  All formulas are unchanged — only the interface is new.
-=============================================================
-"""
+
 
 import math
 import os
