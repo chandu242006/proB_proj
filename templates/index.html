@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tennis Endurance Simulator</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+
+    <!-- HEADER -->
+    <header>
+      <h1>Tennis Player Endurance &amp; Winning Probability</h1>
+      <p class="subtitle">
+        Based on "Analyzing Player Endurance and Winning Probability in Tennis Matches"<br>
+        V.Yashaswee, P.Chandhra Sekhar, B.Ravi Kishore, K.N.Meera &mdash; Amrita Vishwa Vidyapeetham
+      </p>
+      <div class="formula-strip">
+        <span class="formula-tag">P(X=k) = (1-p)^(k-1) · p</span>
+        <span class="formula-tag">E(X) = 1/p</span>
+        <span class="formula-tag">f(x) = λ·e^(−λx)</span>
+        <span class="formula-tag">E(X) = 1/λ</span>
+        <span class="formula-tag">p(t) = p₀·e^(−λt)</span>
+      </div>
+    </header>
+
+    <!-- INPUT FORM -->
+    <div class="card">
+      <h2>Player &amp; Match Parameters</h2>
+      <form action="/simulate" method="POST" novalidate>
+        <div class="form-grid">
+
+          <div class="field">
+            <label for="p0">Initial Winning Probability (p₀)</label>
+            <span class="hint">Must be between 0 and 1 &mdash; e.g. 0.6</span>
+            <input type="number" id="p0" name="p0"
+              step="0.01" min="0.01" max="0.99"
+              placeholder="e.g. 0.6"
+              value="{{ inputs.p0 if inputs else '' }}" required />
+          </div>
+
+          <div class="field">
+            <label for="lam">Fatigue Rate (λ)</label>
+            <span class="hint">Must be &gt; 0 &mdash; 0.01 = slow fatigue</span>
+            <input type="number" id="lam" name="lam"
+              step="0.001" min="0.001"
+              placeholder="e.g. 0.01"
+              value="{{ inputs.lam if inputs else '' }}" required />
+          </div>
+
+          <div class="field">
+            <label for="k">Attempt Number (k)</label>
+            <span class="hint">Point attempt to evaluate P(X = k), must be ≥ 1</span>
+            <input type="number" id="k" name="k"
+              step="1" min="1"
+              placeholder="e.g. 3"
+              value="{{ inputs.k if inputs else '' }}" required />
+          </div>
+
+          <div class="field">
+            <label for="match_duration">Match Duration (minutes)</label>
+            <span class="hint">Total match length in minutes, must be &gt; 0</span>
+            <input type="number" id="match_duration" name="match_duration"
+              step="1" min="1"
+              placeholder="e.g. 120"
+              value="{{ inputs.match_duration if inputs else '' }}" required />
+          </div>
+
+          <div class="field">
+            <label for="interval">Analysis Interval (minutes)</label>
+            <span class="hint">How often to sample &mdash; e.g. every 15 min</span>
+            <input type="number" id="interval" name="interval"
+              step="1" min="1"
+              placeholder="e.g. 15"
+              value="{{ inputs.interval if inputs else '' }}" required />
+          </div>
+
+        </div>
+
+        <button type="submit" class="btn-simulate">&#9654;&nbsp; Run Simulation</button>
+      </form>
+    </div>
+
+    <!-- ERROR BANNER -->
+    {% if error %}
+    <div class="error-banner">
+      <strong>Input Error:</strong> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- RESULTS -->
+    {% if results %}
+
+    <!-- Section 1: Geometric Distribution -->
+    <div class="card">
+      <div class="section-label">
+        <span class="section-number">1</span>
+        <h2>Geometric Distribution &mdash; Points to Win</h2>
+      </div>
+      <div class="steps">
+        <div class="step-row">
+          <span class="step-label">Formula</span>
+          <span class="step-value">P(X = k) = (1 − p)^(k−1) × p</span>
+        </div>
+        <div class="step-row">
+          <span class="step-label">Values</span>
+          <span class="step-value">p = {{ results.geo.p }}, k = {{ results.geo.k }}</span>
+        </div>
+        <div class="step-row">
+          <span class="step-label">Step 1</span>
+          <span class="step-value">
+            (1 − {{ results.geo.p }})^({{ results.geo.k }} − 1)
+            = {{ results.geo.step1_base }}^{{ results.geo.step1_exp }}
+            = {{ results.geo.step1_result }}
+          </span>
+        </div>
+        <div class="step-row">
+          <span class="step-label">Step 2</span>
+          <span class="step-value">Multiply by p = {{ results.geo.p }}</span>
+        </div>
+        <div class="step-row">
+          <span class="step-label">Result</span>
+          <span class="step-value highlight">
+            P(X = {{ results.geo.k }}) = {{ results.geo.p_xk }}
+            &nbsp;({{ results.geo.p_xk_pct }}% chance)
+          </span>
+        </div>
+        <div class="step-row">
+          <span class="step-label">E(X)</span>
+          <span class="step-value highlight">{{ results.geo.expected_formula }}</span>
+        </div>
+      </div>
+      <p style="font-size:0.85rem;color:#7fa8c9;">
+        There is a <strong style="color:#4fc3f7;">{{ results.geo.p_xk_pct }}%</strong>
+        chance the player wins exactly on attempt {{ results.geo.k }}.
+        On average, this player needs <strong style="color:#4fc3f7;">{{ results.geo.ex }}</strong>
+        points played to win one point.
+      </p>
+    </div>
+
+    <!-- Section 2: Exponential Distribution -->
+    <div class="card">
+      <div class="section-label">
+        <span class="section-number">2</span>
+        <h2>Exponential Distribution &mdash; Endurance over Time</h2>
+      </div>
+      <div class="steps" style="margin-bottom:1rem;">
+        <div class="step-row">
+          <span class="step-label">Formula</span>
+          <span class="step-value">f(x) = λ × e^(−λx)</span>
+        </div>
+        <div class="step-row">
+          <span class="step-label">λ</span>
+          <span class="step-value">{{ results.exp.lam }}</span>
+        </div>
+        <div class="step-row">
+          <span class="step-label">E(X) = 1/λ</span>
+          <span class="step-value highlight">
+            {{ results.exp.avg_endurance }} minutes of peak energy on average
+          </span>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Time (min)</th>
+            <th>f(x) — Endurance Density</th>
+            <th>Visual</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in results.exp.rows %}
+          <tr>
+            <td>{{ row.t }}</td>
+            <td>{{ row.fx }}</td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar-fill" style="width: {{ row.bar }}px;"></div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 3: Combined Model -->
+    <div class="card">
+      <div class="section-label">
+        <span class="section-number">3</span>
+        <h2>Combined Model &mdash; Win Probability with Fatigue</h2>
+      </div>
+      <div class="steps" style="margin-bottom:1rem;">
+        <div class="step-row">
+          <span class="step-label">Formula</span>
+          <span class="step-value">p(t) = p₀ × e^(−λ × t)</span>
+        </div>
+        <div class="step-row">
+          <span class="step-label">p₀</span>
+          <span class="step-value">{{ results.combined.p0 }}</span>
+        </div>
+        <div class="step-row">
+          <span class="step-label">λ</span>
+          <span class="step-value">{{ results.combined.lam }}</span>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Time (min)</th>
+            <th>p(t) — Win Probability</th>
+            <th>Win %</th>
+            <th>Stage</th>
+            <th>Visual</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in results.combined.rows %}
+          <tr>
+            <td>{{ row.t }}</td>
+            <td>{{ row.pt }}</td>
+            <td>{{ row.pt_pct }}%</td>
+            <td>
+              <span class="stage-badge {{ row.stage_class }}">{{ row.stage }}</span>
+            </td>
+            <td>
+              <div class="bar-cell">
+                <div class="bar-fill" style="width: {{ row.bar }}px;"></div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 4: Stage-wise Summary -->
+    <div class="card">
+      <div class="section-label">
+        <span class="section-number">4</span>
+        <h2>Stage-wise Summary</h2>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-card early">
+          <div class="stage-title">Early Stage</div>
+          <div class="time-label">t = {{ results.summary.early_t }} min</div>
+          <div class="prob-big">{{ results.summary.p_early_pct }}%</div>
+          <div class="prob-sub">p({{ results.summary.early_t }}) = {{ results.summary.p_early }}</div>
+          <p style="font-size:0.75rem;color:#5a7a9a;margin-top:0.4rem;">Endurance high, performing at best</p>
+        </div>
+        <div class="summary-card middle">
+          <div class="stage-title">Middle Stage</div>
+          <div class="time-label">t = {{ results.summary.mid_t }} min</div>
+          <div class="prob-big">{{ results.summary.p_mid_pct }}%</div>
+          <div class="prob-sub">p({{ results.summary.mid_t }}) = {{ results.summary.p_mid }}</div>
+          <p style="font-size:0.75rem;color:#5a7a9a;margin-top:0.4rem;">Endurance dropping, small errors begin</p>
+        </div>
+        <div class="summary-card late">
+          <div class="stage-title">Late Stage</div>
+          <div class="time-label">t = {{ results.summary.late_t }} min</div>
+          <div class="prob-big">{{ results.summary.p_late_pct }}%</div>
+          <div class="prob-sub">p({{ results.summary.late_t }}) = {{ results.summary.p_late }}</div>
+          <p style="font-size:0.75rem;color:#5a7a9a;margin-top:0.4rem;">Fatigue high, significant performance drop</p>
+        </div>
+      </div>
+      <div class="drop-banner">
+        ⚠ Overall winning probability dropped by
+        <strong>{{ results.summary.drop_pct }}%</strong> over the match duration.
+      </div>
+    </div>
+
+    <!-- Conclusion -->
+    <div class="card">
+      <h2>Conclusion &mdash; Key Takeaways from the Paper</h2>
+      <ul class="conclusion-list">
+        <li>Geometric Distribution shows how skill (p) determines how quickly a player wins points.</li>
+        <li>Exponential Distribution shows how fatigue (λ) causes energy to decline over match time.</li>
+        <li>Combined Model proves that winning probability is NOT constant — it decreases with time due to fatigue.</li>
+        <li>Players with low λ (slow fatigue) maintain performance longer and have better late-match winning chances.</li>
+        <li>Endurance can override skill in long matches.</li>
+      </ul>
+    </div>
+
+    {% endif %}
+
+    <footer>
+      Tennis Endurance &amp; Winning Probability Simulator &mdash; Academic Research Tool
+    </footer>
+
+  </div>
+</body>
+</html>

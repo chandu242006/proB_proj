@@ -1,0 +1,366 @@
+/* ============================================================
+   Tennis Endurance Simulator — Stylesheet
+   ============================================================ */
+
+/* ── Reset & base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: #0f1923;
+  color: #e8edf2;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── Layout ───────────────────────────────────────────────── */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #1e3a5f;
+}
+
+header h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #4fc3f7;
+  letter-spacing: 0.5px;
+}
+
+header p.subtitle {
+  margin-top: 0.4rem;
+  color: #7fa8c9;
+  font-size: 0.95rem;
+}
+
+.formula-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.formula-tag {
+  background: #1a2e42;
+  border: 1px solid #2a4a6b;
+  border-radius: 4px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.78rem;
+  color: #90caf9;
+  font-family: "Courier New", monospace;
+}
+
+/* ── Cards ────────────────────────────────────────────────── */
+.card {
+  background: #162130;
+  border: 1px solid #1e3a5f;
+  border-radius: 10px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.75rem;
+}
+
+.card h2 {
+  font-size: 1.05rem;
+  color: #4fc3f7;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #1e3a5f;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 600;
+}
+
+/* ── Form grid ────────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+}
+
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: 0.85rem;
+  color: #90caf9;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.field .hint {
+  font-size: 0.75rem;
+  color: #5a7a9a;
+  margin-top: -0.2rem;
+}
+
+.field input {
+  background: #0f1923;
+  border: 1px solid #2a4a6b;
+  border-radius: 6px;
+  padding: 0.55rem 0.8rem;
+  color: #e8edf2;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #4fc3f7;
+}
+
+.field input::placeholder { color: #3a5a7a; }
+
+/* ── Button ───────────────────────────────────────────────── */
+.btn-simulate {
+  display: block;
+  width: 100%;
+  margin-top: 1.4rem;
+  padding: 0.75rem;
+  background: #0277bd;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-simulate:hover  { background: #0288d1; }
+.btn-simulate:active { transform: scale(0.99); }
+
+/* ── Error banner ─────────────────────────────────────────── */
+.error-banner {
+  background: #3b1a1a;
+  border: 1px solid #c62828;
+  border-radius: 8px;
+  padding: 0.9rem 1.2rem;
+  color: #ef9a9a;
+  margin-bottom: 1.75rem;
+  font-size: 0.93rem;
+}
+
+.error-banner strong { color: #ef5350; }
+
+/* ── Section labels ───────────────────────────────────────── */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.section-number {
+  background: #0277bd;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.section-label h2 { border: none; margin: 0; padding: 0; }
+
+/* ── Intermediate steps ───────────────────────────────────── */
+.steps {
+  background: #0f1923;
+  border: 1px solid #1e3a5f;
+  border-radius: 7px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.step-row {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #1a2e42;
+  font-size: 0.88rem;
+}
+
+.step-row:last-child { border-bottom: none; }
+
+.step-label {
+  color: #7fa8c9;
+  min-width: 110px;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.step-value {
+  color: #e8edf2;
+  font-family: "Courier New", monospace;
+}
+
+.step-value.highlight { color: #4fc3f7; font-weight: 700; }
+
+/* ── Data tables ──────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  margin-top: 0.5rem;
+}
+
+.data-table th {
+  background: #1a2e42;
+  color: #90caf9;
+  text-align: left;
+  padding: 0.55rem 0.8rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.data-table td {
+  padding: 0.45rem 0.8rem;
+  border-bottom: 1px solid #1a2e42;
+  color: #c8d8e8;
+  font-family: "Courier New", monospace;
+}
+
+.data-table tr:hover td { background: #1a2e42; }
+
+/* ── Progress bars ────────────────────────────────────────── */
+.bar-cell { display: flex; align-items: center; gap: 0.5rem; }
+
+.bar-fill {
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #0277bd, #4fc3f7);
+  min-width: 2px;
+  transition: width 0.3s;
+}
+
+/* ── Stage badges ─────────────────────────────────────────── */
+.stage-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.stage-early  { background: #1b4332; color: #6ee7b7; }
+.stage-middle { background: #1e3a5f; color: #93c5fd; }
+.stage-late   { background: #3b1a1a; color: #fca5a5; }
+
+/* ── Summary cards ────────────────────────────────────────── */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  .summary-grid { grid-template-columns: 1fr; }
+}
+
+.summary-card {
+  background: #0f1923;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.summary-card.early  { border-top: 3px solid #6ee7b7; }
+.summary-card.middle { border-top: 3px solid #93c5fd; }
+.summary-card.late   { border-top: 3px solid #fca5a5; }
+
+.summary-card .stage-title {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #7fa8c9;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+}
+
+.summary-card .time-label {
+  font-size: 0.75rem;
+  color: #5a7a9a;
+  margin-bottom: 0.5rem;
+}
+
+.summary-card .prob-big {
+  font-size: 1.7rem;
+  font-weight: 700;
+  font-family: "Courier New", monospace;
+  color: #4fc3f7;
+}
+
+.summary-card .prob-sub { font-size: 0.8rem; color: #7fa8c9; }
+
+/* ── Drop warning ─────────────────────────────────────────── */
+.drop-banner {
+  background: #2d1f00;
+  border: 1px solid #b45309;
+  border-radius: 8px;
+  padding: 0.75rem 1.1rem;
+  color: #fcd34d;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* ── Conclusion list ──────────────────────────────────────── */
+.conclusion-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.conclusion-list li {
+  display: flex;
+  gap: 0.7rem;
+  font-size: 0.9rem;
+  color: #b0c8e0;
+  line-height: 1.5;
+}
+
+.conclusion-list li::before {
+  content: "✔";
+  color: #4fc3f7;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+footer {
+  text-align: center;
+  margin-top: 3rem;
+  color: #3a5a7a;
+  font-size: 0.8rem;
+}
